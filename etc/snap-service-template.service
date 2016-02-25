@@ -1,0 +1,6 @@
+[Unit]
+Description=Create daily btrfs snapshots
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/snap-create -t daily /home /home/.snap

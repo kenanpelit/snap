@@ -1,0 +1,10 @@
+[Unit]
+Description=Trigger snap daily snapshots
+
+[Timer]
+OnCalendar=daily
+AccuracySec=1h
+Persistent=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,174 @@
+#!/usr/bin/env ruby
+
+# Copyright (c) 2015-2016 Stefan Tatschner
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+require 'date'
+require 'English'
+require 'optparse'
+require 'ostruct'
+
+class CLI
+  # Return a structure describing the options.
+  def self.parse(args)
+    # The options specified on the command line will be collected in *options*.
+    # We set default values here.
+    options = OpenStruct.new
+    options.number = nil
+    options.hourly = nil
+    options.daily = nil
+    options.weekly = nil
+    options.monthly = nil
+    options.yearly = nil
+    options.verbose = false
+
+    opt_parser = OptionParser.new do |opts|
+      opts.banner = "usage: #{File.basename(__FILE__)} [OPTIONS] TARGET"
+
+      opts.separator ''
+      opts.separator 'options:'
+
+      opts.on('-n', '--number N', Integer,
+              '[EXPERIMENTAL] Number of snapshots to keep') do |n|
+        options.number = n
+      end
+
+      opts.on('-H', '--hourly N', Integer,
+              'Number of hourly snapshots to keep') do |n|
+        options.hourly = n
+      end
+
+      opts.on('-d', '--daily N', Integer,
+              'Number of daily snapshots to keep') do |n|
+        options.daily = n
+      end
+
+      opts.on('-w', '--weekly N', Integer,
+              'Number of weekly snapshots to keep') do |n|
+        options.weekly = n
+      end
+
+      opts.on('-m', '--monthly N', Integer,
+              'Number of monthly snapshots to keep') do |n|
+        options.monthly = n
+      end
+
+      opts.on('-y', '--yearly N', Integer,
+              'Number of yearly snapshots to keep') do |n|
+        options.yearly = n
+      end
+
+      opts.separator ''
+      opts.separator 'common options:'
+
+      opts.on('-v', '--[no-]verbose', 'Be verbose') do |v|
+        options.verbose = v
+      end
+
+      opts.on_tail('-h', '--help', 'Show this page and exit') do
+        puts opts
+        exit
+      end
+    end
+
+    opt_parser.parse!(args)
+    options
+  end
+end
+
+class Snapshot
+  attr_reader :path, :otime
+
+  def initialize(path, otime)
+    # btrfs-progs omits the leading slash
+    @path = path[0] == '/' ? path : "/#{path}"
+    @otime = otime
+  end
+
+  def delete
+    puts `btrfs subvolume delete #{@path}`
+    exit $CHILD_STATUS if $CHILD_STATUS != 0
+  end
+
+  def to_s
+    @path
+  end
+end
+
+def prune(snapshots, n)
+  snapshots.sort_by!(&:otime)
+
+  if snapshots.any?
+    until snapshots.length <= n
+      snapshots.first.delete
+      snapshots.delete_at(0)
+    end
+  end
+
+  snapshots.each { |s| puts "Keeping \"#{s}\"" }
+end
+
+options = CLI.parse(ARGV)
+target = ARGV.first
+
+if options.number && (options.hourly || options.daily || options.weekly ||
+                      options.monthly || options.yearly)
+  puts "Error: Date and number based pruning are mutual exclusive."
+  exit 1
+end
+
+if target.nil?
+  CLI.parse(['--help'])
+  exit 1
+end
+
+snapshots_list = `btrfs subvolume list -os #{target}`.split("\n")
+snapshots_hourly = []
+snapshots_daily = []
+snapshots_weekly = []
+snapshots_monthly = []
+snapshots_yearly = []
+
+snapshots_list.each do |s|
+  s = s.split(' ')
+  snapshot = Snapshot.new(
+    s[13],
+    DateTime.strptime(s[10] + s[11], '%Y-%m-%d%H:%M:%S')
+  )
+
+  case snapshot.path
+  when /^.+hourly.+$/
+    snapshots_hourly << snapshot
+  when /^.+daily.+$/
+    snapshots_daily << snapshot
+  when /^.+weekly.+$/
+    snapshots_weekly << snapshot
+  when /^.+monthly.+$/
+    snapshots_monthly << snapshot
+  when /^.+yearly.+$/
+    snapshots_yearly << snapshot
+  end
+end
+
+prune(snapshots_hourly, options.hourly)
+prune(snapshots_daily, options.daily)
+prune(snapshots_weekly, options.weekly)
+prune(snapshots_monthly, options.monthly)
+prune(snapshots_yearly, options.yearly)

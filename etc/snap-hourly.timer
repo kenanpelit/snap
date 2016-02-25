@@ -1,0 +1,11 @@
+[Unit]
+Description=Trigger snap hourly snapshots
+
+[Timer]
+OnCalendar=hourly
+# TODO: What is this and does it actually work?
+# AccuracySec=1h
+Persistent=true
+
+[Install]
+WantedBy=multi-user.target
