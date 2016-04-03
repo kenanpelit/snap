@@ -48,9 +48,9 @@ Run snap periodically
 To run snap periodically it the following lines cab be added to the global
 crontab:
 
-@hourly root    snap create -t hourly /home /home/.snap
-@daily  root    snap create -t daily  /home /home/.snap
-@weekly root    snap create -t weekly /home /home/.snap
+    @hourly root    snap create -t hourly /home /home/.snap
+    @daily  root    snap create -t daily  /home /home/.snap
+    @weekly root    snap create -t weekly /home /home/.snap
 
 The "-t" argument adds the given type to the snapshot name enabling easy pruning
 by "snap-prune" depending on directory name patterns. "hourly", "daily",
