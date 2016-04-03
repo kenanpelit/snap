@@ -1,0 +1,6 @@
+[Unit]
+Description=Prune btrfs snapshots
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/snap-prune -H 12 -d 14 -w 4 /home/.snap

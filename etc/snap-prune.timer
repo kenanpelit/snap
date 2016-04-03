@@ -3,8 +3,6 @@ Description=Trigger for snap-prune
 
 [Timer]
 OnCalendar=hourly
-# TODO: What is this and does it actually work?
-# AccuracySec=1h
 Persistent=true
 
 [Install]

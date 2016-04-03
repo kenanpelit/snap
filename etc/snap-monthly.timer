@@ -3,7 +3,6 @@ Description=Trigger snap monthly snapshots
 
 [Timer]
 OnCalendar=monthly
-AccuracySec=1h
 Persistent=true
 
 [Install]

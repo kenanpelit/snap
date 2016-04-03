@@ -1,5 +1,5 @@
 [Unit]
-Description=Create daily btrfs snapshots
+Description=Daily btrfs snapshot
 
 [Service]
 Type=oneshot

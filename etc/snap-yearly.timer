@@ -3,7 +3,6 @@ Description=Trigger snap yearly snapshots
 
 [Timer]
 OnCalendar=yearly
-AccuracySec=1h
 Persistent=true
 
 [Install]
