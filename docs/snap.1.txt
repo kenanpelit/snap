@@ -9,7 +9,7 @@ snap - Collection of shellscripts to create and prune btrfs snapshots easily.
 == Synopsis
 
 ----
-snap [-h] COMMAND [<args>]
+snap [-hV] COMMAND [<args>]
 ----
 
 == Description

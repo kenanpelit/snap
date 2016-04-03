@@ -20,8 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+VERSION="0.1.0"
+
 usage() {
-    echo "usage: $(basename $0) [-h] COMMAND [<args>]"
+    echo "usage: $(basename $0) [-hV] COMMAND [<args>]"
     echo ""
     echo "commands:"
     echo "  init      Init snap directory structure"
@@ -30,9 +32,14 @@ usage() {
     echo "  list      Show a list of available snap snapshots"
 }
 
-while getopts "h" arg; do
+version() {
+    echo "$(basename $0) $VERSION"
+}
+
+while getopts "hV" arg; do
     case $arg in
         h)  usage;   exit 0;;
+        V)  version; exit 0;;
     esac
 done
 
