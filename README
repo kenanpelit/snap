@@ -7,12 +7,12 @@ Motivation
 ----------
 
 The motivation of creating "snap" has been the lack of a proper btrfs snapshot
-tool that just does one thing well. The reference tool for btrfs snapshots is
-"snapper" which is a great piece of software. But on the other hand includes a
-lot of bloatware... It is written in C++, uses dbus and xml and provides a bunch
-of commands that can be done with "btrfs-progs" anyway. So, the goal of snap is
-to provide a mechanism for creating and pruning btrfs snapshots easily without
-requiring any additional tools but "btrfs-progs", "coreutils", "bash" and
+tools that just does one thing well. The reference tool for btrfs snapshots is
+"snapper" which is a great piece of software. But on the other hand it includes
+a lot of bloatware... It is written in C++, uses dbus and xml, provides a bunch
+of commands that can be done with "btrfs-progs" anyway... So, the goal of snap
+is to provide a mechanism for creating and pruning btrfs snapshots easily
+without requiring any additional tools but "btrfs-progs", "coreutils", "sh" and
 "ruby".
 
 For further information checkout the manpages at:
