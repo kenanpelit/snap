@@ -1,0 +1,78 @@
+= snap(1)
+:doctype:    manpage
+:man source: snap
+
+== Name
+
+snap - Collection of shellscripts to create and prune btrfs snapshots easily.
+
+== Synopsis
+
+----
+snap [-h] COMMAND [<args>]
+----
+
+== Description
+
+"snap" consists of serveral scipts, which in theory can be written in any
+language. These scripts follow the pattern "snap-subcommand" and are connected
+together with a main "snap" script. The principle is very similar to the very
+early "Git" architecture. "snap" is designed to remain very simple and it
+follows the Unix philosphy "do one thing and do it well". "snap-create", for
+instance, just takes the source directory and the destination (i. e. where the
+snapshot shall be stored); the name pattern is expanded automatically.
+Everything else is up to the user; "snap" does not create any shiny and super
+fancy database files or other useless crap.
+
+== Commands
+
+init::
+    Create the initial directory structure, see
+    link:snap-init.1.html[snap-init(1)].
+
+create::
+    Create a snapshot of a btrfs subvolume, see
+    link:snap-create.1.html[snap-create(1)].
+
+list::
+    List available btrfs snapshots, see
+    link:snap-list.1.html[snap-list(1)].
+
+prune::
+    Prune existing btrfs snapshot depending on configurable pattern, see
+    link:snap-prune.1.html[snap-prune(1)].
+
+== Using snap
+
+First the directory structure for snap has to be created. Please note that only
+btrfs subvolumes can be snapshotted. To snapshots of the "/home" subvolume in
+the "/home/.snap" subvolume the following commands can be used:
+
+----
+# snap init /home/.snap
+# snap create /home /home/.snap
+----
+
+It is recommended to create the snapshots within a further subvolume, such as
+"/home/.snap" in order to keep flexibility. In the future, for instance quota
+can be added to the ".snap" subvolume easily.
+
+== Run snap periodically
+
+To run snap periodically the following lines can be added to the global
+crontab:
+
+----
+@hourly root    snap create -t hourly /home /home/.snap
+@daily  root    snap create -t daily  /home /home/.snap
+@weekly root    snap create -t weekly /home /home/.snap
+----
+
+The "-t" argument adds the given type to the snapshot name enabling easy pruning
+by "snap-prune" depending on directory name patterns. "hourly", "daily",
+"weekly", "monthly" and "yearly" are supported.
+
+For using systemd.timer(5), there are templates in the etc/ directory of this
+repository. Distributions may ship the examples in `/usr/share/snap/`.
+
+include::footer.txt[]

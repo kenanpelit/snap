@@ -1,0 +1,66 @@
+= snap-prune(1)
+:doctype:    manpage
+:man source: snap
+
+== Name
+
+snap-prune - Delete btrfs snapshots.
+
+== Synopsis
+
+----
+snap-prune [-hv] [-n N] [-H N] [-d N] [-w N] [-m N] [-y N]
+----
+
+== Description
+
+Delete btrfs snapshot based on type patterns.
+
+== Options
+
+-n N::
+    Number of snapshots to keep.
+
+    NOTE: This is not yet implemented!
+
+-H N::
+    Number of hourly snapshots to keep.
+
+-d N::
+    Number of daily snapshots to keep.
+
+-w N::
+    Number of weekly snapshots to keep.
+
+-m N::
+    Number of monthly snapshots to keep.
+
+-y N::
+    Number of yearly snapshots to keep.
+
+== Example
+
+----
+# snap-prune -H 12 -d 14 -w 4 /home/.snap
+Delete subvolume (no-commit): '/home/.snap/home_hourly_2016-04-02-180009'
+Delete subvolume (no-commit): '/home/.snap/home_hourly_2016-04-02-190007'
+Delete subvolume (no-commit): '/home/.snap/home_hourly_2016-04-02-200003'
+Keeping "/home/.snap/home_hourly_2016-04-03-101659"
+Keeping "/home/.snap/home_hourly_2016-04-03-110048"
+Keeping "/home/.snap/home_hourly_2016-04-03-120048"
+Keeping "/home/.snap/home_hourly_2016-04-03-130048"
+Keeping "/home/.snap/home_hourly_2016-04-03-140048"
+Keeping "/home/.snap/home_hourly_2016-04-03-150048"
+Keeping "/home/.snap/home_hourly_2016-04-03-160048"
+Keeping "/home/.snap/home_hourly_2016-04-03-170641"
+Keeping "/home/.snap/home_hourly_2016-04-03-180047"
+Keeping "/home/.snap/home_hourly_2016-04-03-190133"
+Keeping "/home/.snap/home_hourly_2016-04-03-195328"
+Keeping "/home/.snap/home_hourly_2016-04-03-200037"
+Keeping "/home/.snap/home_daily_2016-04-01-000449"
+Keeping "/home/.snap/home_daily_2016-04-02-100057"
+Keeping "/home/.snap/home_daily_2016-04-03-101659"
+Keeping "/home/.snap/home_weekly_2016-04-01-000449"
+----
+
+include::footer.txt[]

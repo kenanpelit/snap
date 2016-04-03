@@ -1,0 +1,41 @@
+= snap-list(1)
+:doctype:    manpage
+:man source: snap
+
+== Name
+
+snap-list - List available btrfs snapshots
+
+== Synopsis
+
+----
+snap-list [-h] TARGET
+----
+
+== Description
+
+Displays a table of available btrfs snapshots at TARGET.
+
+== Example
+
+----
+# snap-list /home/.snap
+2016-04-01 00:04:49     /home/.snap/home_daily_2016-04-01-000449
+2016-04-01 00:04:49     /home/.snap/home_weekly_2016-04-01-000449
+2016-04-02 10:00:57     /home/.snap/home_daily_2016-04-02-100057
+2016-04-03 10:16:59     /home/.snap/home_daily_2016-04-03-101659
+2016-04-03 10:16:59     /home/.snap/home_hourly_2016-04-03-101659
+2016-04-03 11:00:49     /home/.snap/home_hourly_2016-04-03-110048
+2016-04-03 12:00:49     /home/.snap/home_hourly_2016-04-03-120048
+2016-04-03 13:00:49     /home/.snap/home_hourly_2016-04-03-130048
+2016-04-03 14:00:49     /home/.snap/home_hourly_2016-04-03-140048
+2016-04-03 15:00:48     /home/.snap/home_hourly_2016-04-03-150048
+2016-04-03 16:00:49     /home/.snap/home_hourly_2016-04-03-160048
+2016-04-03 17:06:41     /home/.snap/home_hourly_2016-04-03-170641
+2016-04-03 18:00:48     /home/.snap/home_hourly_2016-04-03-180047
+2016-04-03 19:01:33     /home/.snap/home_hourly_2016-04-03-190133
+2016-04-03 19:53:28     /home/.snap/home_hourly_2016-04-03-195328
+2016-04-03 20:00:38     /home/.snap/home_hourly_2016-04-03-200037
+----
+
+include::footer.txt[]

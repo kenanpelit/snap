@@ -15,46 +15,5 @@ to provide a mechanism for creating and pruning btrfs snapshots easily without
 requiring any additional tools but "btrfs-progs", "coreutils", "bash" and
 "ruby".
 
-Principle
----------
-
-"snap" consists of serveral scipts, which in theory can be written in any
-language. These scripts follow the pattern "snap-subcommand" and are connected
-together with a main "snap" script. The principle is very similar to the very
-early "Git" architecture. "snap" is designed to remain very simple and it
-follows the Unix philosphy "do one thing and do it well". "snap-create", for
-instance, just takes the source directory and the destination (i. e. where the
-snapshot shall be stored); the name pattern is expanded automatically.
-Everything else is up to the user; "snap" does not create any shiny and super
-fancy database files or other useless crap.
-
-Using snap
-----------
-
-First the directory structure for snap has to be created. Please note that only
-btrfs subvolumes can be snapshotted. To snapshots of the "/home" subvolume in
-the "/home/.snap" subvolume the following commands can be used:
-
-    # snap init /home/.snap
-    # snap create /home /home/.snap
-
-It is recommended to create the snapshots within a further subvolume, such as
-"/home/.snap" in order to keep flexibility. In the future, for instance quota
-can be added to the ".snap" subvolume easily.
-
-Run snap periodically
----------------------
-
-To run snap periodically it the following lines cab be added to the global
-crontab:
-
-    @hourly root    snap create -t hourly /home /home/.snap
-    @daily  root    snap create -t daily  /home /home/.snap
-    @weekly root    snap create -t weekly /home /home/.snap
-
-The "-t" argument adds the given type to the snapshot name enabling easy pruning
-by "snap-prune" depending on directory name patterns. "hourly", "daily",
-"weekly", "monthly" and "yearly" are supported.
-
-For using systemd.timer(5), there are templates in the etc/ directory of this
-repository.
+For further information checkout the manpages at:
+https://docs.sevenbyte.org/snap

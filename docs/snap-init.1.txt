@@ -1,0 +1,27 @@
+= snap-init(1)
+:doctype:    manpage
+:man source: snap
+
+== Name
+
+snap-init - Initialize directory structure for btrfs snapshots
+
+== Synopsis
+
+----
+snap-init [-h] TARGET
+----
+
+== Description
+
+Create a directory structure for btrfs snapshots managed with snap. Currently
+it only creates a btrfs subvolume at TARGET.
+
+== Example
+
+----
+# snap-init /home/.snap
+Create subvolume '/home/.snap'
+----
+
+include::footer.txt[]

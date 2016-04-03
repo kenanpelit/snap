@@ -1,0 +1,48 @@
+= snap-create(1)
+:doctype:    manpage
+:man source: snap
+
+== Name
+
+snap-create - Create a snapshot of a btrfs subvolume
+
+== Synopsis
+
+----
+snap-create [-rh] [-t TYPE] SRC DST
+----
+
+== Description
+
+`snap-create` creates a snapshot of a btrfs subvolume. It takes the subvolume
+SRC and creates a snapshot in DST. The basename of the snapshot is created
+automatically and includes the current timestamp and an optional type (e.g.
+hourly, daily, ...). DST has to be initialized with
+link:snap-init.1.html[snap-init(1)] first.
+
+== Options
+
+-r::
+    Create a readonly snapshot.
+
+-t TYPE::
+
+    Add a type into the filename; a type can be a freely chosen string. This is
+    useful for post-processing snapshots with tools like
+    link:snap-prune.1.html[snap-prune(1)]. snap-prune(1) recognizes the
+    following type strings:
+
+    * hourly
+    * daily
+    * weekly
+    * monthly
+    * yearly
+
+== Example
+
+----
+# snap-create -r -t hourly /home /home/.snap
+Create a readonly snapshot of '/home' in '/home/.snap/home_hourly_2016-04-03-195328'
+----
+
+include::footer.txt[]
