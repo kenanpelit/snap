@@ -38,8 +38,8 @@ version() {
 
 while getopts "hV" arg; do
     case $arg in
-        h)  usage;   exit 0;;
-        V)  version; exit 0;;
+        h)  usage   && exit 0;;
+        V)  version && exit 0;;
     esac
 done
 

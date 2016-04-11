@@ -37,7 +37,7 @@ while getopts "rt:h" arg; do
     case "$arg" in
         r)  OPTS="$OPTS -r";;
         t)  SNAP_TYPE="$OPTARG";;
-        h)  usage; exit 0;;
+        h)  usage && exit 0;;
     esac
 done
 
