@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/bin/sh
 
 # Copyright (c) 2015-2016 Stefan Tatschner
 #
@@ -20,155 +20,86 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'date'
-require 'English'
-require 'optparse'
-require 'ostruct'
+usage() {
+    echo "usage: $(basename $0) [-Hdwmy N] [-h] TARGET"
+    echo ''
+    echo 'common options:'
+    echo '  -H N         Keep N hourly snapshots'
+    echo '  -d N         Keep N daily snapshots'
+    echo '  -w N         Keep N weekly snapshots'
+    echo '  -m N         Keep N monthly snapshots'
+    echo '  -y N         Keep N yearly snapshots'
+    echo '  -r           Dry run; do not delete anything'
+    echo '  -h           Show this page and exit'
+}
 
-class CLI
-  # Return a structure describing the options.
-  def self.parse(args)
-    # The options specified on the command line will be collected in *options*.
-    # We set default values here.
-    options = OpenStruct.new
-    options.number = nil
-    options.hourly = nil
-    options.daily = nil
-    options.weekly = nil
-    options.monthly = nil
-    options.yearly = nil
-    options.verbose = false
+prune() {
+    # $1: tmpfile that includes list of subvolumes
+    # $2: type, for instance "hourly", "daily", ...
+    # $3: number of $type to keep
+    case "$2" in
+        hourly)     regex="^.+hourly.+$";;
+        daily)      regex="^.+daily.+$";;
+        weekly)     regex="^.+weekly.+$";;
+        monthly)    regex="^.+monthly.+$";;
+        yearly)     regex="^.+yearly.+$";;
+    esac
 
-    opt_parser = OptionParser.new do |opts|
-      opts.banner = "usage: #{File.basename(__FILE__)} [OPTIONS] TARGET"
+    snaps=$(grep -E "$regex" "$1" | awk '{print $NF}' | sort)
+    n=$(echo "$snaps" | wc -l)
 
-      opts.separator ''
-      opts.separator 'options:'
+    # TODO: Why is $n always 1 greater?
+    if [ "$n" = "1" ]; then
+       return
+    fi
 
-      opts.on('-n', '--number N', Integer,
-              '[EXPERIMENTAL] Number of snapshots to keep') do |n|
-        options.number = n
-      end
+    i="1"
+    if [ "$n" -gt "$3" ]; then
+        echo "$snaps" | while read -r snap; do
+            remaining=$(($n - $i))
 
-      opts.on('-H', '--hourly N', Integer,
-              'Number of hourly snapshots to keep') do |n|
-        options.hourly = n
-      end
+            if [ "$DRYRUN" = "yes" ]; then
+                echo "Would delete: /$snap"
+            else
+                btrfs subvolume delete "$snap"
+            fi
 
-      opts.on('-d', '--daily N', Integer,
-              'Number of daily snapshots to keep') do |n|
-        options.daily = n
-      end
+            if [ "$remaining" -eq "$3" ]; then
+                break
+            fi
 
-      opts.on('-w', '--weekly N', Integer,
-              'Number of weekly snapshots to keep') do |n|
-        options.weekly = n
-      end
+            i=$(($i + 1))
+        done
+    fi
+}
 
-      opts.on('-m', '--monthly N', Integer,
-              'Number of monthly snapshots to keep') do |n|
-        options.monthly = n
-      end
 
-      opts.on('-y', '--yearly N', Integer,
-              'Number of yearly snapshots to keep') do |n|
-        options.yearly = n
-      end
+while getopts "H:d:w:m:y:rh" arg; do
+    case "$arg" in
+        H)  HOURLIES="$OPTARG";;
+        d)  DAILIES="$OPTARG";;
+        w)  WEEKLIES="$OPTARG";;
+        m)  MONTHLIES="$OPTARG";;
+        y)  YEARLIES="$OPTARG";;
+        r)  DRYRUN="yes";;
+        h)  usage && exit 0;;
+    esac
+done
 
-      opts.separator ''
-      opts.separator 'common options:'
+shift $((OPTIND - 1))
 
-      opts.on('-v', '--[no-]verbose', 'Be verbose') do |v|
-        options.verbose = v
-      end
+cd /
+TARGET="$1"
+[ -z "$TARGET" ] && usage && exit 1
 
-      opts.on_tail('-h', '--help', 'Show this page and exit') do
-        puts opts
-        exit
-      end
-    end
+subvolumes="$(mktemp)"
+btrfs subvolume list -os "$TARGET" > "$subvolumes"
 
-    opt_parser.parse!(args)
-    options
-  end
-end
+prune "$subvolumes" "hourly" "$HOURLIES"
+prune "$subvolumes" "daily" "$DAILIES"
+prune "$subvolumes" "weekly" "$WEEKLIES"
+prune "$subvolumes" "monthly" "$MONTHLIES"
+prune "$subvolumes" "yearly" "$YEARLIES"
 
-class Snapshot
-  attr_reader :path, :otime
-
-  def initialize(path, otime)
-    # btrfs-progs omits the leading slash
-    @path = path[0] == '/' ? path : "/#{path}"
-    @otime = otime
-  end
-
-  def delete
-    puts `btrfs subvolume delete #{@path}`
-    exit $CHILD_STATUS if $CHILD_STATUS != 0
-  end
-
-  def to_s
-    @path
-  end
-end
-
-def prune(snapshots, n)
-  snapshots.sort_by!(&:otime)
-
-  if snapshots.any?
-    until snapshots.length <= n
-      snapshots.first.delete
-      snapshots.delete_at(0)
-    end
-  end
-
-  snapshots.each { |s| puts "Keeping \"#{s}\"" }
-end
-
-options = CLI.parse(ARGV)
-target = ARGV.first
-
-if options.number && (options.hourly || options.daily || options.weekly ||
-                      options.monthly || options.yearly)
-  puts "Error: Date and number based pruning are mutual exclusive."
-  exit 1
-end
-
-if target.nil?
-  CLI.parse(['--help'])
-  exit 1
-end
-
-snapshots_list = `btrfs subvolume list -os #{target}`.split("\n")
-snapshots_hourly = []
-snapshots_daily = []
-snapshots_weekly = []
-snapshots_monthly = []
-snapshots_yearly = []
-
-snapshots_list.each do |s|
-  s = s.split(' ')
-  snapshot = Snapshot.new(
-    s[13],
-    DateTime.strptime(s[10] + s[11], '%Y-%m-%d%H:%M:%S')
-  )
-
-  case snapshot.path
-  when /^.+hourly.+$/
-    snapshots_hourly << snapshot
-  when /^.+daily.+$/
-    snapshots_daily << snapshot
-  when /^.+weekly.+$/
-    snapshots_weekly << snapshot
-  when /^.+monthly.+$/
-    snapshots_monthly << snapshot
-  when /^.+yearly.+$/
-    snapshots_yearly << snapshot
-  end
-end
-
-prune(snapshots_hourly, options.hourly)
-prune(snapshots_daily, options.daily)
-prune(snapshots_weekly, options.weekly)
-prune(snapshots_monthly, options.monthly)
-prune(snapshots_yearly, options.yearly)
+# Cleanup temporary file
+rm "$subvolumes"
