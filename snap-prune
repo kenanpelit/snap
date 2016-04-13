@@ -21,7 +21,7 @@
 # THE SOFTWARE.
 
 usage() {
-    echo "usage: $(basename $0) [-Hdwmy N] [-h] TARGET"
+    echo "usage: $(basename $0) [-Hdwmy N] [-rh] TARGET"
     echo ''
     echo 'common options:'
     echo '  -H N         Keep N hourly snapshots'
