@@ -21,7 +21,7 @@
 # THE SOFTWARE.
 
 usage() {
-    echo "usage: $(basename $0) [-Hdwmy N] [-rh] TARGET"
+    echo "usage: $(basename $0) [-Hdwmy N] [-rvh] TARGET"
     echo ''
     echo 'common options:'
     echo '  -H N         Keep N hourly snapshots'
@@ -30,6 +30,7 @@ usage() {
     echo '  -m N         Keep N monthly snapshots'
     echo '  -y N         Keep N yearly snapshots'
     echo '  -r           Dry run; do not delete anything'
+    echo '  -v           Be verbose'
     echo '  -h           Show this page and exit'
 }
 
@@ -74,7 +75,7 @@ prune() {
 }
 
 
-while getopts "H:d:w:m:y:rh" arg; do
+while getopts "H:d:w:m:y:rvh" arg; do
     case "$arg" in
         H)  HOURLIES="$OPTARG";;
         d)  DAILIES="$OPTARG";;
@@ -82,6 +83,7 @@ while getopts "H:d:w:m:y:rh" arg; do
         m)  MONTHLIES="$OPTARG";;
         y)  YEARLIES="$OPTARG";;
         r)  DRYRUN="yes";;
+        v)  VERBOSE="yes";;
         h)  usage && exit 0;;
     esac
 done
@@ -100,6 +102,10 @@ prune "$subvolumes" "daily" "$DAILIES"
 prune "$subvolumes" "weekly" "$WEEKLIES"
 prune "$subvolumes" "monthly" "$MONTHLIES"
 prune "$subvolumes" "yearly" "$YEARLIES"
+if [ "$VERBOSE" = "yes" ]; then
+    echo "Pruning finished. Keeping:"
+    snap-list -l "$TARGET"
+fi
 
 # Cleanup temporary file
 rm "$subvolumes"
