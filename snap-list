@@ -21,19 +21,27 @@
 # THE SOFTWARE.
 
 usage() {
-    echo "usage: $(basename $0) [-h] TARGET"
+    echo "usage: $(basename $0) [-lh] TARGET"
     echo ''
     echo 'common options:'
+    echo '  -l           Only list subvolumes; no dates column'
     echo '  -h           Show this page and exit'
 }
 
-while getopts "h" arg; do
+while getopts "hl" arg; do
     case "$arg" in
-        h)  usage && exit 0;;
+        l) NODATES="yes";;
+        h) usage && exit 0;;
+        *) usage && exit 1;;
     esac
 done
 
 shift $((OPTIND - 1))
 
 [ -z "$1" ] && usage && exit 1
-btrfs subvolume list -os "$1" | awk '{print $11 " " $12 "\t" "/" $14}'
+
+if [ "$NODATES" = "yes" ]; then
+    btrfs subvolume list -os "$1" | awk '{print "/" $14}'
+else
+    btrfs subvolume list -os "$1" | awk '{print $11 " " $12 "\t" "/" $14}'
+fi
