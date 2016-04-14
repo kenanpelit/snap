@@ -9,12 +9,19 @@ snap-list - List available btrfs snapshots
 == Synopsis
 
 ----
-snap-list [-h] TARGET
+snap-list [-lh] TARGET
 ----
 
 == Description
 
 Displays a table of available btrfs snapshots at TARGET.
+
+== Options ==
+
+-l::
+    Just list the subvolumes in TARGET. Do not show any dates
+    column. This option is used in snap-prune(1) to generate a
+    verbose summary without too much spam.
 
 == Example
 
