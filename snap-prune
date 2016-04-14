@@ -98,11 +98,12 @@ TARGET="$1"
 subvolumes="$(mktemp)"
 btrfs subvolume list -os "$TARGET" > "$subvolumes"
 
-prune "$subvolumes" "hourly" "$HOURLIES"
-prune "$subvolumes" "daily" "$DAILIES"
-prune "$subvolumes" "weekly" "$WEEKLIES"
-prune "$subvolumes" "monthly" "$MONTHLIES"
-prune "$subvolumes" "yearly" "$YEARLIES"
+[ -n "$HOURLIES" ] && prune "$subvolumes" "hourly" "$HOURLIES"
+[ -n "$DAILIES" ]  && prune "$subvolumes" "daily" "$DAILIES"
+[ -n "$WEEKLIES" ] && prune "$subvolumes" "weekly" "$WEEKLIES"
+[ -n "$HOURLIES" ] && prune "$subvolumes" "monthly" "$MONTHLIES"
+[ -n "$YEARLIES" ] && prune "$subvolumes" "yearly" "$YEARLIES"
+
 if [ "$VERBOSE" = "yes" ]; then
     echo "Pruning finished. Keeping:"
     snap-list -l "$TARGET"
