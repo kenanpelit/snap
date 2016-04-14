@@ -85,6 +85,7 @@ while getopts "H:d:w:m:y:rvh" arg; do
         r)  DRYRUN="yes";;
         v)  VERBOSE="yes";;
         h)  usage && exit 0;;
+        *)  usage && exit 1;;
     esac
 done
 
