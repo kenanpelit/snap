@@ -38,7 +38,7 @@ prune() {
     # $1: tmpfile that includes list of subvolumes
     # $2: type, for instance "hourly", "daily", ...
     # $3: number of $type to keep
-    regex="^.+${$2}.+$"
+    regex="^.+${2}.+$"
     snaps=$(grep -E "$regex" "$1" | awk '{print $NF}' | sort)
     n=$(echo "$snaps" | wc -l)
 
