@@ -45,4 +45,4 @@ link:snap-init.1.html[snap-init(1)] first.
 Create a readonly snapshot of '/home' in '/home/.snap/home_hourly_2016-04-03-195328'
 ----
 
-include::footer.txt[]
+include::footer.adoc[]

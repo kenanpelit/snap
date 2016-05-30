@@ -49,4 +49,4 @@ Delete subvolume (no-commit): '/home/.snap/home_hourly_2016-04-02-190007'
 Delete subvolume (no-commit): '/home/.snap/home_hourly_2016-04-02-200003'
 ----
 
-include::footer.txt[]
+include::footer.adoc[]

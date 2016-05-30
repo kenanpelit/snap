@@ -75,4 +75,4 @@ by "snap-prune" depending on directory name patterns. "hourly", "daily",
 For using systemd.timer(5), there are templates in the etc/ directory of this
 repository. Distributions may ship the examples in `/usr/share/snap/`.
 
-include::footer.txt[]
+include::footer.adoc[]

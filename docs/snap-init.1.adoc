@@ -24,4 +24,4 @@ it only creates a btrfs subvolume at TARGET.
 Create subvolume '/home/.snap'
 ----
 
-include::footer.txt[]
+include::footer.adoc[]

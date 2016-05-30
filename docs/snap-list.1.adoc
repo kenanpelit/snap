@@ -45,4 +45,4 @@ Displays a table of available btrfs snapshots at TARGET.
 2016-04-03 20:00:38     /home/.snap/home_hourly_2016-04-03-200037
 ----
 
-include::footer.txt[]
+include::footer.adoc[]
