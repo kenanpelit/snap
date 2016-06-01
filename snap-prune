@@ -35,11 +35,14 @@ usage() {
 }
 
 prune() {
-    # $1: tmpfile that includes list of subvolumes
-    # $2: type, for instance "hourly", "daily", ...
-    # $3: number of $type to keep
-    regex="^.+${2}.+$"
-    snaps=$(grep -E "$regex" "$1" | awk '{print $NF}' | sort)
+    # $1: base directory where the snapshots live
+    # $2: tmpfile that includes list of subvolumes
+    # $3: type, for instance "hourly", "daily", ...
+    # $4: number of $type to keep
+    target="$1"
+    snaps=$(grep -E "$regex" "$2" | awk '{print $NF}' | sort)
+    regex="^.+${3}.+$"
+    keep="$4"
     n=$(echo "$snaps" | wc -l)
 
     # TODO: Why is $n always 1 greater?
@@ -48,17 +51,17 @@ prune() {
     fi
 
     i="1"
-    if [ "$n" -gt "$3" ]; then
+    if [ "$n" -gt "$keep" ]; then
         echo "$snaps" | while read -r snap; do
             remaining=$(($n - $i))
 
             if [ "$DRYRUN" = "yes" ]; then
-                echo "Would delete: /$snap"
+                echo "Would delete: $target/$snap"
             else
-                btrfs subvolume delete "$snap"
+                btrfs subvolume delete "$target/$snap"
             fi
 
-            if [ "$remaining" -eq "$3" ]; then
+            if [ "$remaining" -eq "$keep" ]; then
                 break
             fi
 
@@ -89,13 +92,13 @@ TARGET="$1"
 [ -z "$TARGET" ] && usage && exit 1
 
 subvolumes="$(mktemp)"
-btrfs subvolume list -os "$TARGET" > "$subvolumes"
+btrfs subvolume list -s "$TARGET" > "$subvolumes"
 
-[ -n "$HOURLIES" ] && prune "$subvolumes" "hourly" "$HOURLIES"
-[ -n "$DAILIES" ]  && prune "$subvolumes" "daily" "$DAILIES"
-[ -n "$WEEKLIES" ] && prune "$subvolumes" "weekly" "$WEEKLIES"
-[ -n "$HOURLIES" ] && prune "$subvolumes" "monthly" "$MONTHLIES"
-[ -n "$YEARLIES" ] && prune "$subvolumes" "yearly" "$YEARLIES"
+[ -n "$HOURLIES" ] && prune "$TARGET" "$subvolumes" "hourly"  "$HOURLIES"
+[ -n "$DAILIES" ]  && prune "$TARGET" "$subvolumes" "daily"   "$DAILIES"
+[ -n "$WEEKLIES" ] && prune "$TARGET" "$subvolumes" "weekly"  "$WEEKLIES"
+[ -n "$HOURLIES" ] && prune "$TARGET" "$subvolumes" "monthly" "$MONTHLIES"
+[ -n "$YEARLIES" ] && prune "$TARGET" "$subvolumes" "yearly"  "$YEARLIES"
 
 if [ "$VERBOSE" = "yes" ]; then
     echo "Pruning finished. Keeping:"
