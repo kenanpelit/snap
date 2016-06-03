@@ -40,8 +40,8 @@ prune() {
     # $3: type, for instance "hourly", "daily", ...
     # $4: number of $type to keep
     target="$1"
-    snaps=$(grep -E "$regex" "$2" | awk '{print $NF}' | sort)
     regex="^.+${3}.+$"
+    snaps=$(grep -E "$regex" "$2" | awk '{print $NF}' | sort)
     keep="$4"
     n=$(echo "$snaps" | wc -l)
 
