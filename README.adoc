@@ -14,3 +14,6 @@ without requiring any additional tools but `btrfs-progs`, `coreutils` and `sh`.
 
 For further information checkout the manpages at:
 https://docs.sevenbyte.org/snap
+
+A little introduction is available at:
+https://blog.sevenbyte.org/2016/08/03/manage-btrfs-snapshots.html
