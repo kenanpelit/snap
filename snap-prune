@@ -45,15 +45,18 @@ prune() {
     keep="$4"
     n=$(echo "$snaps" | wc -l)
 
-    # TODO: Why is $n always 1 greater?
-    if [ "$n" = "1" ]; then
-       return
-    fi
-
     i="1"
     if [ "$n" -gt "$keep" ]; then
         echo "$snaps" | while read -r snap; do
             remaining=$((n - i))
+
+            # If there are no remaining snapshots, "$n" is always "1"
+            # due to some weird blank line behaviour. Checking if
+            # "$snap" is empty instead is IMO a bit uglier, but maybe
+            # also safer as it adds a new sanity check.
+            if [ -z "$snap" ]; then
+                break
+            fi
 
             if [ "$DRYRUN" = "yes" ]; then
                 echo "Would delete: $target/$snap"
