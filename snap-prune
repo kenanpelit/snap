@@ -94,11 +94,11 @@ TARGET="$1"
 subvolumes="$(mktemp)"
 btrfs subvolume list -s "$TARGET" > "$subvolumes"
 
-[ -n "$HOURLIES" ] && prune "$TARGET" "$subvolumes" "hourly"  "$HOURLIES"
-[ -n "$DAILIES" ]  && prune "$TARGET" "$subvolumes" "daily"   "$DAILIES"
-[ -n "$WEEKLIES" ] && prune "$TARGET" "$subvolumes" "weekly"  "$WEEKLIES"
-[ -n "$HOURLIES" ] && prune "$TARGET" "$subvolumes" "monthly" "$MONTHLIES"
-[ -n "$YEARLIES" ] && prune "$TARGET" "$subvolumes" "yearly"  "$YEARLIES"
+[ -n "$HOURLIES" ]  && prune "$TARGET" "$subvolumes" "hourly"  "$HOURLIES"
+[ -n "$DAILIES" ]   && prune "$TARGET" "$subvolumes" "daily"   "$DAILIES"
+[ -n "$WEEKLIES" ]  && prune "$TARGET" "$subvolumes" "weekly"  "$WEEKLIES"
+[ -n "$MONTHLIES" ] && prune "$TARGET" "$subvolumes" "monthly" "$MONTHLIES"
+[ -n "$YEARLIES" ]  && prune "$TARGET" "$subvolumes" "yearly"  "$YEARLIES"
 
 if [ "$VERBOSE" = "yes" ]; then
     echo "Pruning finished. Keeping:"
